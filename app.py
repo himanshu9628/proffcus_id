@@ -13,7 +13,7 @@ from flask import Flask, jsonify,render_template,request,redirect,url_for
 # from flask_restful import Resource, Api
 from datetime import datetime
 import himanshudata
-import scraper,json
+import json
 # creating the flask app
 app = Flask(__name__)
 # creating an API object
