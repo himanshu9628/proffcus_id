@@ -5,7 +5,7 @@
 
 
 # from re import U
-from msilib.text import tables
+# from msilib.text import tables
 import sqlite3
 import appDetails
 import imp
