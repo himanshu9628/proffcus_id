@@ -1,14 +1,10 @@
 
-# using flask_restful
 
 
-
-
-# from re import U
-# from msilib.text import tables
 import sqlite3
+# from turtle import update
 import appDetails
-import imp
+# import imp
 from flask import Flask, jsonify,render_template,request,redirect,url_for
 # from flask_restful import Resource, Api
 from datetime import datetime
@@ -88,6 +84,7 @@ def my_form_post():
             else:
                 t = li
             # print(li)
+            # print("infirst"*1000)
             # print("@@@@@@@@@")
             lis = t.split('#')
             refres['list'] = lis
@@ -134,22 +131,25 @@ def my_form_post():
                 rows = cur.fetchall() 
                 insert_rows = []
                 update_rows = []
-
+                # print(rows)
+                # print(lis)
                 if len(rows) > 0 :
                     for i in lis:
                         # print(i[0])
                         if i in [j[0] for j in rows]:
-                            lis.remove(i)
+                            # lis.remove(i)
                             # new_list.append(i[0])
                             update_rows.append("'"+str(i)+"'")
 
                         else:
                             # print("===in else==="*100)
 
-                            insert_rows.append("('"+i+"','"+str(a)+"','new')")
+                            insert_rows.append("('"+i+"','"+str(a)+"','New_added')")
                 else:
                     for i in lis:
-                        insert_rows.append("('"+i+"','"+str(a)+"','new')")
+                        insert_rows.append("('"+i+"','"+str(a)+"','New_added')")
+                # print("---"*100)
+                # print(lis)
                 # print("---"*100)
                 # print(insert_rows)
                 # print("#"*100)
@@ -157,6 +157,8 @@ def my_form_post():
                 if len(insert_rows) > 0:
                     values = ', '.join(map(str, insert_rows))
                     sql = "INSERT INTO packageId1 VALUES {}".format(values)
+                    # print(query)
+                    # print("##"*100)
                     # print("*"*1000)
                     # print(sql)
                     cur = con.cursor() 
@@ -171,33 +173,37 @@ def my_form_post():
                     con.commit()
 
             # return render_template('my-form.html',out_data = refres)
-            return redirect(url_for('Home', some = json.dumps(refres)))
+            return redirect(url_for('Home'))
 
         
 @app.route('/Home')
 def Home():
-    messages = request.args
-    messages = request.args['some']    
-    # messages = session['messages']  
-    # print(type(messages))
-    # print(messages)
-    # print("#"*100)
-    msg=  json.loads(messages)
-    list2 = msg.get('list')
-    print("**"*40)
-    new_list1 = {'output':[],'test':{},"cat":"New Added"}
+    
+    new_list1 = {'output':[],'test':{},"cat":"New Added","status":{}}
     con = sqlite3.connect("database.db")  
     con.row_factory = sqlite3.Row
     # package_list = 
-    for i in list2:
-
+    cur = con.cursor()  
+    quer = que  ="SELECT *  FROM 'packageId1' ORDER BY app_status"
+    cur.execute(quer)
+    rows1 = cur.fetchall()
+    list2 = [dict(ix) for ix in rows1]
+    # print("$"*100)
+    # print(list2)
+    # exit()
+    for j in list2:
+        i = j.get('PackageId')
         cur = con.cursor()  
-        quer = que  ="SELECT * FROM 'packageId1' WHERE PackageId = '"+i+"'"
+        quer = que  ="SELECT app_status FROM 'packageId1' WHERE PackageId = '"+i+"'"
         cur.execute(quer)
         rows1 = cur.fetchall()
         package_list = [dict(ix) for ix in rows1]
-
+        # print(i)
+        # print(type(package_list[0]))
+        # exit()
         # i = j.get('PackageId')
+        new_list1['status'][i] = []
+        new_list1['status'][i].append(package_list[0].get('app_status'))
         new_list1['output'].append(i)
         new_list1['test'][i] = []
         cur = con.cursor()
@@ -206,7 +212,8 @@ def Home():
         cur.execute(que)
         row1 = cur.fetchall()
         updated_list = [dict(ix) for ix in row1]
-
+        print(updated_list)
+        # exit()
         cur = con.cursor()
         cur.execute(que1)
         row2 = cur.fetchall()
@@ -239,7 +246,7 @@ def Home():
             new_list1['test'][i].append(updated_list[-1].get('conversion'))
             new_list1['test'][i].append(once)
             new_list1['test'][i].append(updated_list[-1].get('Tracking'))
-            new_list1['test'][i].append(updated_list[-1].get('New/update'))
+            new_list1['test'][i].append(updated_list[-1].get('NewORupdate'))
             new_list1['test'][i].append(updated_list[-1].get('Updated_by'))
 
         else:
@@ -258,6 +265,8 @@ def Home():
                 new_list1['test'][i].append("Not Available")
                 new_list1['test'][i].append("Not Available")
         # print(new_list1)
+        print(new_list1)
+        # exit()
     return  render_template('newdata.html',out_data=new_list1)
 
 
