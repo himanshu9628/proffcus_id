@@ -1,4 +1,5 @@
 # from turtle import update
+# from os import stat
 import pandas as pd
 import json
 from datetime import datetime
@@ -30,13 +31,15 @@ def updated():
     issue_dicts  = df_issue.to_dict('records')
     new_list = []
     issue_list = []
+    # print(dicts)
     for i in dicts:
 
         if i.get('live status') == 'Today/yesterday Converted':
             status = 'TRUE'
         else:
             status = 'FALSE'
-        tmp = {"Tracking":i.get('Tracking'),"Package_name":i.get('Application ID'),"New/update":i.get('New / Update'),"conversion":status, 'once':i.get('conversion status '), 'country':i.get('Country'),'last_update':i.get('Last Updated'),'Updated_by':i.get('Code Writer')}
+        # print(i.get('New/Update'))
+        tmp = {"Tracking":i.get('Tracking'),"Package_name":i.get('Application ID'),"New_update":i.get('New/Update'),"conversion":status, 'once':i.get('conversion status '), 'country':i.get('Country'),'last_update':i.get('Last Updated'),'Updated_by':i.get('Code Writer')}
         new_list.append(tmp)
 
 
@@ -47,44 +50,61 @@ def updated():
     return new_list,issue_list
 
     # print(update_list)
-# def get():
-#     updated_list,issue_list = updated()
+def get():
+    updated_list,issue_list = updated()
 
-#     conn = sqlite3.connect('database.db')
-#     conn.execute("create table IF NOT EXISTS updatedetails (Package_name TEXT  ,Tracking TEXT NOT NULL,NewORupdate TEXT,conversion TEXT,once TEXT,country TEXT,last_update TEXT, Updated_by TEXT )")  
-#     conn.execute("create table IF NOT EXISTS issueApp (Package_name TEXT  ,issue TEXT,Name TEXT,Date TEXT)")  
-#     d = []
-#     with sqlite3.connect("database.db") as con: 
+    # with sqlite3.connect("database.db") as con: 
 
-#         con.execute('DELETE FROM updatedetails')
-#         con.commit()
-#         for i in updated_list:
-#             if str(i.get('Package_name')) == 'nan' or '-' in str(i.get('Package_name')):
-#                 print(i.get('Package_name'))
-#             else:
-#                 if len(i.get('Package_name')) <6 :
-#                     if ser.search(regex, i.get('Package_name')) :
-#                         print(i.get('Package_name'))
-#                     else:
-#                         pass
-#                 else:
-#                     # print("Invalid Name Enter Valid Name")
-#                     # d.append(i.get('Package_name'))
-#                     cur = con.cursor() 
-#                     cur.execute("INSERT into updatedetails (Package_name ,Tracking,NewORupdate,conversion,once,country,last_update,Updated_by) values (?,?,?,?,?,?,?,?)",(i.get('Package_name').strip(),i.get('Tracking'),i.get('New/update'),i.get('conversion'),i.get('once'),i.get('country'),i.get('last_update'),i.get('Updated_by')))  
-#                     con.commit()
+    #     con.execute('DELETE FROM updatedetails')
+    #     con.commit()
 
-#     # print(d)
-#     with sqlite3.connect("database.db") as con:  
-#         con.execute('DELETE FROM issueApp')
-#         con.commit()
-#         for i in issue_list:
-#             cur = con.cursor() 
-#             cur.execute("INSERT into issueApp (Package_name,issue,Name,Date) values (?,?,?,?)",(i.get('Package_name'),i.get('issue'),i.get('Name'),i.get('Date')))  
-#             con.commit()
+    # print(updated_list)
+    # for i in updated_list:
+    #     print(i.get('New_update'))
+    # exit()
+    conn = sqlite3.connect('database.db')
+    conn.execute("create table IF NOT EXISTS updatedetails (Package_name TEXT  ,Tracking TEXT NOT NULL,NewORupdate TEXT,conversion TEXT,once TEXT,country TEXT,last_update TEXT, Updated_by TEXT )")  
+    conn.execute("create table IF NOT EXISTS issueApp (Package_name TEXT  ,issue TEXT,Name TEXT,Date TEXT)")  
+    # d = []
+    with sqlite3.connect("database.db") as con: 
+
+        con.execute('DELETE FROM updatedetails')
+        con.commit()
+        for i in updated_list:
+            if str(i.get('Package_name')) == 'nan' or '-' in str(i.get('Package_name')):
+                # print(i.get('Package_name'))
+                pass
+            else:
+                if len(i.get('Package_name')) <6 :
+                    # if ser.search(regex, i.get('Package_name')) :
+                    #     # print(i.get('Package_name'))
+                    #     pass
+                    # else:
+                    #     pass
+                    pass
+                else:
+                    # print("Invalid Name Enter Valid Name")
+                    # d.append(i.get('Package_name'))
+                    status = i.get('New_update')
+                    # print(status)
+                    cur = con.cursor() 
+                    cur.execute("INSERT into updatedetails (Package_name ,Tracking,NewORupdate,conversion,once,country,last_update,Updated_by) values (?,?,?,?,?,?,?,?)",(i.get('Package_name').strip(),i.get('Tracking'),status,i.get('conversion'),i.get('once'),i.get('country'),i.get('last_update'),i.get('Updated_by')))  
+                    con.commit()
+
+    # print(d)
+    with sqlite3.connect("database.db") as con:  
+        con.execute('DELETE FROM issueApp')
+        con.commit()
+        for i in issue_list:
+            cur = con.cursor() 
+            cur.execute("INSERT into issueApp (Package_name,issue,Name,Date) values (?,?,?,?)",(i.get('Package_name'),i.get('issue'),i.get('Name'),i.get('Date')))  
+            con.commit()
+    
+    print("successful Done ........................")
 
 
-# get()
+
+get()
 
 # def show():
 #     con = sqlite3.connect("database.db")  
@@ -138,7 +158,7 @@ def refresh():
                     # print("Invalid Name Enter Valid Name")
                     # d.append(i.get('Package_name'))
                     cur = con.cursor() 
-                    cur.execute("INSERT into updatedetails (Package_name ,Tracking,NewORupdate,conversion,once,country,last_update,Updated_by) values (?,?,?,?,?,?,?,?)",(i.get('Package_name').strip(),i.get('Tracking'),i.get('New/update'),i.get('conversion'),i.get('once'),i.get('country'),i.get('last_update'),i.get('Updated_by')))  
+                    cur.execute("INSERT into updatedetails (Package_name ,Tracking,NewORupdate,conversion,once,country,last_update,Updated_by) values (?,?,?,?,?,?,?,?)",(i.get('Package_name').strip(),i.get('Tracking'),i.get('New_update'),i.get('conversion'),i.get('once'),i.get('country'),i.get('last_update'),i.get('Updated_by')))  
                     con.commit()
 
     # print(d)
